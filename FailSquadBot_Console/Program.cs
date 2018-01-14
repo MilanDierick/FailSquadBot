@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -12,7 +13,7 @@ namespace FailSquadBot_Console
         private DiscordSocketClient _client;
         private CommandService _commandService;
         private IServiceProvider _serviceProvider;
-        private const string Token = "NDAxNzE0MTI2Mzk0NDkwODgw.DTuTMA.VbWXmH7-YLojgbvA-mxii1WzwGQ";
+        private const string Token = "NDAxNzE0MTI2Mzk0NDkwODgw.DTuTMA.VbWXmH7-YLojgbvA-mxii1WzwGQ"; // TODO: Avoid hard coding my token!
         
         public static void Main(string[] args)
             => new Program().MainAsync().GetAwaiter().GetResult();
@@ -26,9 +27,10 @@ namespace FailSquadBot_Console
                 .AddSingleton(_client)
                 .AddSingleton(_commandService)
                 .BuildServiceProvider();
+
+            await InstallCommandsAsync();
             
             _client.Log += ClientOnLog;
-            _client.MessageReceived += ClientOnMessageReceived;
 
             await _client.LoginAsync(TokenType.Bot, Token);
             await _client.StartAsync();
@@ -36,15 +38,36 @@ namespace FailSquadBot_Console
             await Task.Delay(-1);
         }
 
-        private static async Task ClientOnMessageReceived(SocketMessage socketMessage)
+        private async Task InstallCommandsAsync()
         {
-            if (socketMessage.Content == "!ping")
-            {
-                await socketMessage.Channel.SendMessageAsync("Pong!");
-            }
+            // Hook the MessageReceived Event into our command Handler.
+            _client.MessageReceived += HandleCommandsAsync;
+
+            // Discover all of the commands in this assembly and load them.
+            await _commandService.AddModulesAsync(Assembly.GetEntryAssembly());
         }
 
-        private static Task ClientOnLog(LogMessage logMessage)
+        private async Task HandleCommandsAsync(SocketMessage arg)
+        {
+            // Don't process the command if it was a System message.
+            if (!(arg is SocketUserMessage message)) return;
+            
+            // Create a number to track where the prefix ends and the command begins.
+            var argPos = 0;
+            
+            // Determine if the message is a command, based on if it starts with '!' or a mention prefix.
+            if (!(message.HasCharPrefix('!', ref argPos)) | message.HasMentionPrefix(_client.CurrentUser, ref argPos)) return ;
+
+            // Create a Command Context
+            var context = new SocketCommandContext(_client, message);
+            
+            // Execute the command. (result does not indicate a return value, rather an object stating if the command exectuted succesfully)
+            var result = await _commandService.ExecuteAsync(context, argPos, _serviceProvider);
+            if (!result.IsSuccess)
+                await context.Channel.SendMessageAsync(result.ErrorReason);
+        }
+
+        public static Task ClientOnLog(LogMessage logMessage)
         {
             Console.WriteLine(logMessage.ToString());
             return Task.CompletedTask;
