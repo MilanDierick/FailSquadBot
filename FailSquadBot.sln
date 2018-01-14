@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FailSquadBot_Console", "FailSquadBot_Console\FailSquadBot_Console.csproj", "{120B93A1-CD39-47E6-BB80-68218D97802B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{120B93A1-CD39-47E6-BB80-68218D97802B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{120B93A1-CD39-47E6-BB80-68218D97802B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{120B93A1-CD39-47E6-BB80-68218D97802B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{120B93A1-CD39-47E6-BB80-68218D97802B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
