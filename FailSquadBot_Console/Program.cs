@@ -32,6 +32,7 @@ namespace FailSquadBot_Console
             await InstallCommandsAsync();
             
             _client.Log += ClientOnLog;
+            _client.UserJoined += ClientOnUserJoined;
 
             await _client.LoginAsync(TokenType.Bot, Token);
             await _client.StartAsync();
@@ -72,6 +73,23 @@ namespace FailSquadBot_Console
         {
             Console.WriteLine(logMessage.ToString());
             return Task.CompletedTask;
+        }
+
+        private async Task ClientOnUserJoined(SocketGuildUser socketGuildUser)
+        {
+            var clientGroupChannels = _client.GetGuild(socketGuildUser.Guild.Id).TextChannels;
+
+            var rulesChannel = clientGroupChannels.First(clientGroupChannel => clientGroupChannel.Name == "rules");
+            var applicationInformationChannel = clientGroupChannels.First(clientGroupChannel =>
+                clientGroupChannel.Name == "application-information");
+            var staffApplicationsChannel =
+                clientGroupChannels.First(clientGroupChannel => clientGroupChannel.Name == "staff-applications");
+
+            await socketGuildUser.Guild.TextChannels.Where((channel => channel.Name == "general")).First().SendMessageAsync(
+                "Welcome To The Official FailsQuad Network Discord Server! " + socketGuildUser.Mention +
+                " Enjoy ^-^ make sure to read our click here " + rulesChannel.Mention + " to view our rules. " +
+                "If you are here to apply please go to " + applicationInformationChannel.Mention +
+                " then go to the " + staffApplicationsChannel.Mention);
         }
     }
 }
