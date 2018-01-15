@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
@@ -67,7 +68,7 @@ namespace FailSquadBot_Console
                 await context.Channel.SendMessageAsync(result.ErrorReason);
         }
 
-        public static Task ClientOnLog(LogMessage logMessage)
+        private static Task ClientOnLog(LogMessage logMessage)
         {
             Console.WriteLine(logMessage.ToString());
             return Task.CompletedTask;
